@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b9a4e5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Собирайся">
+  <title>Собирайся!</title>
+  <style>
+    :root {
+      --bg: #f7f4ff;
+      --lavender-50: #faf8ff;
+      --lavender-100: #f0e9ff;
+      --lavender-200: #decef8;
+      --lavender-300: #c7b4ec;
+      --lavender-500: #9f89d4;
+      --lavender-700: #5d527f;
+      --blue-100: #e7f1ff;
+      --blue-200: #cbdff7;
+      --blue-500: #8eaddb;
+      --ink: #4d476d;
+      --muted: #7a7495;
+      --white: #ffffff;
+      --danger: #c97988;
+      --success: #84ae9c;
+      --shadow: 0 10px 28px rgba(91, 77, 128, .13);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: linear-gradient(160deg, #f6f0ff 0%, #edf5ff 100%);
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app { max-width: 760px; margin: 0 auto; min-height: 100vh; padding-bottom: 34px; }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      padding: max(18px, env(safe-area-inset-top)) 20px 16px;
+      background: rgba(247, 244, 255, .86);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(159, 137, 212, .18);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 47px; height: 47px; border-radius: 15px; display: grid; place-items: center;
+      font-size: 27px; background: linear-gradient(135deg, #cbb9ee, #b8d8f5);
+      box-shadow: 0 5px 14px rgba(99, 81, 145, .18);
+    }
+    .brand h1 { margin: 0; font-size: 29px; letter-spacing: -.7px; font-family: "Snell Roundhand", "Segoe Script", cursive; }
+    .brand p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+
+    main { padding: 18px 16px; }
+    .view { display: none; }
+    .view.active { display: block; }
+    h2 { margin: 4px 0 14px; font-size: 21px; letter-spacing: -.3px; }
+    h3 { margin: 0; font-size: 16px; }
+    .hint { color: var(--muted); font-size: 14px; line-height: 1.4; margin: -5px 0 14px; }
+
+    .card {
+      background: rgba(255,255,255,.9); border: 1px solid rgba(159,137,212,.2);
+      box-shadow: var(--shadow); border-radius: 22px; padding: 16px; margin-bottom: 15px;
+    }
+    .purpose-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; }
+    .purpose {
+      min-height: 118px; padding: 14px 10px; text-align: center; border-radius: 20px;
+      border: 1.5px solid var(--lavender-200); background: linear-gradient(145deg, #fff, #fbfaff);
+      color: var(--ink); box-shadow: 0 4px 12px rgba(91,77,128,.06);
+    }
+    .purpose:active { transform: scale(.97); }
+    .purpose.selected { background: linear-gradient(135deg, #d8c6f3, #c5dff7); border-color: #a58ad5; }
+    .purpose .emoji { font-size: 36px; display: block; margin-bottom: 8px; }
+    .purpose .label { font-weight: 700; font-size: 14px; }
+
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 13px; font-weight: 700; margin: 0 0 6px 2px; }
+    .field input, .field select {
+      width: 100%; border: 1.5px solid var(--lavender-200); background: var(--lavender-50);
+      border-radius: 13px; min-height: 46px; padding: 10px 12px; color: var(--ink); outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--lavender-500); background: #fff; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .participant-row { display: grid; grid-template-columns: 1fr 116px 38px; gap: 7px; margin-bottom: 8px; }
+    .participant-row input, .participant-row select { min-width: 0; }
+
+    .btn {
+      border: 0; border-radius: 14px; min-height: 46px; padding: 10px 15px; color: white; font-weight: 750;
+      background: linear-gradient(135deg, #a88fd9, #91bce6); box-shadow: 0 6px 16px rgba(112,92,160,.22);
+    }
+    .btn:active { transform: scale(.98); }
+    .btn.full { width: 100%; }
+    .btn.secondary { background: #ebe6f7; color: var(--lavender-700); box-shadow: none; }
+    .btn.danger { background: #f9e5e9; color: var(--danger); box-shadow: none; }
+    .btn.success { background: linear-gradient(135deg, #9dc3b3, #86adc9); }
+    .icon-btn { border: 0; background: #f6efff; color: var(--lavender-700); border-radius: 11px; min-height: 38px; min-width: 38px; }
+
+    .trip { display: flex; align-items: center; gap: 11px; }
+    .trip .trip-icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 24px; background: linear-gradient(135deg, #e5d9f9, #d7e9fb); }
+    .trip .trip-data { flex: 1; min-width: 0; }
+    .trip .trip-name { font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .trip .trip-meta { margin-top: 3px; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .back { color: var(--lavender-700); background: #eee9fa; border: 0; border-radius: 12px; min-height: 40px; padding: 8px 12px; font-weight: 700; }
+    .progress-text { color: var(--muted); font-size: 13px; margin: 10px 0 7px; }
+    .progress { height: 12px; border-radius: 9px; overflow: hidden; background: #e9e5f4; }
+    .progress > div { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #ad94dd, #96bee8); transition: width .25s ease; }
+
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 14px 1px 8px; -webkit-overflow-scrolling: touch; }
+    .tab { white-space: nowrap; border-radius: 18px; border: 1px solid var(--lavender-200); padding: 8px 12px; background: #fff; color: var(--lavender-700); font-size: 13px; font-weight: 700; }
+    .tab.active { background: linear-gradient(135deg, #c9b5ec, #bad8f3); border-color: #ad94db; color: #514770; }
+
+    .category { margin: 16px 0 8px; color: var(--lavender-700); font-size: 15px; font-weight: 800; }
+    .item { display: flex; align-items: center; gap: 11px; padding: 11px 10px; background: #fff; border-radius: 14px; margin-bottom: 7px; border: 1px solid rgba(159,137,212,.15); }
+    .item.done { opacity: .55; }
+    .item.done .item-name { text-decoration: line-through; }
+    .check { appearance: none; width: 23px; height: 23px; flex: 0 0 23px; border-radius: 8px; border: 2px solid #bca9e3; background: #fff; }
+    .check:checked { background: #a38ad4; border-color: #a38ad4; }
+    .check:checked::after { content: "✓"; display: block; color: white; text-align: center; font-weight: 900; font-size: 16px; line-height: 19px; }
+    .item-body { flex: 1; min-width: 0; }
+    .item-name { font-size: 14px; font-weight: 650; }
+    .item-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .remove { border: 0; background: transparent; color: #bd9ca7; font-size: 18px; padding: 5px; }
+
+    .fab { position: fixed; right: 18px; bottom: max(18px, env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 19px; border: 0; color: white; font-size: 28px; background: linear-gradient(135deg, #a88fd9, #91bce6); box-shadow: 0 10px 24px rgba(97,79,139,.35); }
+
+    dialog { border: 0; border-radius: 23px 23px 0 0; padding: 0; width: min(100%, 760px); margin: auto 0 0; background: transparent; }
+    dialog::backdrop { background: rgba(55,45,80,.34); }
+    dialog .modal { background: #fff; border-radius: 23px 23px 0 0; padding: 20px 16px max(24px, env(safe-area-inset-bottom)); }
+    .modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .empty { text-align:center; color:var(--muted); padding:26px 10px; }
+    .small { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="brand-icon">🧳</div>
+        <div><h1>Собирайся! ♡</h1><p>Списки вещей для любой поездки</p></div>
+      </div>
+    </header>
+
+    <main>
+      <section id="homeView" class="view active">
+        <h2>Куда собираемся?</h2>
+        <p class="hint">Выберите цель поездки или создайте свой список.</p>
+        <div id="purposeGrid" class="purpose-grid"></div>
+        <div class="card" style="margin-top:16px">
+          <div class="topline"><h3>Мои поездки</h3><span id="tripCount" class="small"></span></div>
+          <div id="tripsList" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="createView" class="view">
+        <div class="topline"><button class="back" onclick="showHome()">← Назад</button><span id="chosenPurpose" class="small"></span></div>
+        <h2 style="margin-top:17px">Новая поездка</h2>
+        <div class="card">
+          <div class="field"><label>Название поездки</label><input id="tripName" placeholder="Например, Отпуск на море"></div>
+          <div class="field"><label>Куда</label><input id="destination" placeholder="Город или страна"></div>
+          <div class="row">
+            <div class="field"><label>Начало</label><input id="startDate" type="date"></div>
+            <div class="field"><label>Окончание</label><input id="endDate" type="date"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>Сезон</label><select id="season"><option value="Любой">Любой</option><option>Зима</option><option>Весна</option><option>Лето</option><option>Осень</option></select></div>
+            <div class="field"><label>Транспорт</label><select id="transport"><option value="Любой">Любой</option><option>Автомобиль</option><option>Самолёт</option><option>Поезд</option><option>Автобус</option></select></div>
+          </div>
+          <div class="field"><label>Участники</label><div id="participants"></div><button type="button" class="btn secondary full" onclick="addParticipant()">+ Добавить участника</button></div>
+          <button class="btn full" onclick="createTrip()">Создать список</button>
+        </div>
+      </section>
+
+      <section id="tripView" class="view">
+        <div class="topline"><button class="back" onclick="showHome()">← Поездки</button><button class="back" onclick="saveTemplate()">☆ В шаблоны</button></div>
+        <h2 id="activeTripTitle" style="margin-top:17px"></h2>
+        <div class="card">
+          <div id="progressText" class="progress-text"></div><div class="progress"><div id="progressBar"></div></div>
+          <div id="tabs" class="tabs"></div>
+          <div id="itemsList"></div>
+        </div>
+        <button class="fab" aria-label="Добавить вещь" onclick="openItemDialog()">＋</button>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="itemDialog">
+    <form method="dialog" class="modal" onsubmit="event.preventDefault(); addItem();">
+      <div class="modal-head"><h2>Добавить вещь</h2><button class="icon-btn" type="button" onclick="itemDialog.close()">×</button></div>
+      <div class="field"><label>Что взять</label><input id="itemName" required placeholder="Например, зарядка для телефона"></div>
+      <div class="row">
+        <div class="field"><label>Категория</label><select id="itemCategory"></select></div>
+        <div class="field"><label>Владелец</label><select id="itemOwner"></select></div>
+      </div>
+      <button class="btn full" type="submit">Добавить</button>
+    </form>
+  </dialog>
+
+<script>
+const TEMPLATES = [
+  {id:'travel', icon:'✈️', name:'Путешествие', items:[
+    ['Документы','Паспорт','adult'],['Документы','СНИЛС','adult'],['Документы','Страховой полис','adult'],['Документы','Свидетельство о рождении','child'],['Документы','СНИЛС','child'],['Документы','Страховой полис','child'],['Документы','Билеты и бронирования','Общее'],['Документы','Деньги и карты','Общее'],['Документы','Ключи','Общее'],
+    ['Электроника','Телефон и зарядка','Общее'],['Электроника','Пауэрбанк и кабели','Общее'],['Электроника','Наушники','Общее'],['Электроника','Ноутбук/планшет и зарядка','Общее'],
+    ['Гигиена','Зубные принадлежности','Общее'],['Гигиена','Дезодорант','adult'],['Гигиена','Уходовая косметика','adult'],['Гигиена','Декоративная косметика','adult'],['Гигиена','Средства женской гигиены','adult'],['Гигиена','Средства для волос','adult'],
+    ['Аптечка','Регулярные препараты','Общее'],['Аптечка','Базовая аптечка','Общее'],['Одежда','Одежда по сезону','adult'],['Одежда','Нижнее бельё и носки','adult'],['Одежда','Удобная обувь','adult'],['Одежда','Сменная одежда','child'],['Ребёнок','Любимые игрушки','child'],['Ребёнок','Перекусы и вода','child'],['Ребёнок','Игры в дорогу','child'],['Питомцы','Корм и миски','pet'],['Питомцы','Переноска/поводок','pet'],['Питомцы','Ветеринарный паспорт','pet'],['Прочее','Пакеты для мусора и вещей','Общее']
+  ]},
+  {id:'beach', icon:'🏖️', name:'На море', items:[['Документы','Паспорта, билеты и страховка','Общее'],['Электроника','Телефоны, зарядки и пауэрбанк','Общее'],['Одежда','Купальники/плавки','adult'],['Одежда','Пляжная обувь','adult'],['Одежда','Головной убор от солнца','adult'],['Море','Пляжные полотенца','Общее'],['Море','Пляжная сумка','Общее'],['Гигиена','Солнцезащитный крем','Общее'],['Гигиена','Средство после солнца','Общее'],['Аптечка','Регулярные препараты и базовая аптечка','Общее'],['Ребёнок','Надувные средства и игрушки для воды','child'],['Ребёнок','Перекусы и вода','child']]},
+  {id:'hospital', icon:'🏥', name:'В больницу', items:[['Документы','Паспорт','adult'],['Документы','СНИЛС и страховой полис','adult'],['Документы','Свидетельство о рождении','child'],['Документы','СНИЛС и страховой полис','child'],['Документы','Направление, выписки и результаты обследований','Общее'],['Документы','Рецепты и назначения','Общее'],['Электроника','Телефон и зарядка','Общее'],['Аптечка','Регулярные препараты','Общее'],['Гигиена','Маска и салфетки','Общее'],['Одежда','Сменное бельё','adult'],['Одежда','Пижама/халат и тапочки','adult'],['Еда','Вода и лёгкий перекус','Общее'],['Ребёнок','Игрушка или занятие для ожидания','child']]},
+  {id:'car', icon:'🚗', name:'Автопоездка', items:[['Документы','Водительское удостоверение','adult'],['Документы','Документы на автомобиль и страховка','adult'],['Документы','Деньги, карты и ключи','Общее'],['Авто','Автомобильная аптечка','Общее'],['Авто','Знак аварийной остановки и жилеты','Общее'],['Авто','Насос/компрессор','Общее'],['Электроника','Навигатор/офлайн-карты','Общее'],['Электроника','Автомобильная зарядка','Общее'],['Еда','Вода и перекусы','Общее'],['Дорога','Пледы и подушки','Общее'],['Ребёнок','Игры в дорогу и наушники','child'],['Прочее','Пакеты для мусора','Общее']]},
+  {id:'business', icon:'💼', name:'Командировка', items:[['Документы','Паспорт, билеты и бронирование','adult'],['Документы','Деньги и карты','adult'],['Электроника','Рабочий ноутбук и зарядка','adult'],['Электроника','Наушники, мышь и переходники','adult'],['Электроника','Рабочие файлы офлайн','adult'],['Одежда','Деловая одежда и обувь','adult'],['Гигиена','Зубные принадлежности и косметичка','adult'],['Аптечка','Регулярные препараты','adult']]},
+  {id:'family', icon:'🏠', name:'К родственникам', items:[['Документы','Паспорта и ключи','Общее'],['Прочее','Подарки','Общее'],['Одежда','Удобная одежда и пижама','adult'],['Одежда','Домашние тапочки','adult'],['Электроника','Зарядки','Общее'],['Гигиена','Средства гигиены','adult'],['Ребёнок','Игрушки и развлечения','child'],['Питомцы','Корм и принадлежности','pet']]},
+  {id:'dacha', icon:'🌿', name:'На дачу', items:[['Одежда','Рабочая одежда и обувь','adult'],['Одежда','Дождевик и тёплая кофта','adult'],['Аптечка','Аптечка и средство от укусов','Общее'],['Гигиена','Солнцезащитный крем','Общее'],['Прочее','Перчатки для сада','Общее'],['Прочее','Фонарик','Общее'],['Еда','Вода и еда','Общее'],['Ребёнок','Игры для ребёнка','child']]},
+  {id:'camping', icon:'⛺', name:'Поход/кемпинг', items:[['Поход','Палатка','Общее'],['Поход','Спальники и коврики','Общее'],['Поход','Фонари и батарейки','Общее'],['Поход','Горелка и газ','Общее'],['Поход','Посуда','Общее'],['Еда','Вода и запас еды','Общее'],['Аптечка','Аптечка и репеллент','Общее'],['Одежда','Дождевик и запас сухих носков','adult'],['Прочее','Пакеты для мусора','Общее']]},
+  {id:'winter', icon:'🎿', name:'Зимний отдых', items:[['Одежда','Термобельё','adult'],['Одежда','Тёплая верхняя одежда','adult'],['Одежда','Шапка, шарф и перчатки','adult'],['Одежда','Тёплые носки и обувь','adult'],['Гигиена','Крем от холода и бальзам для губ','adult'],['Еда','Термос','Общее'],['Аптечка','Регулярные препараты и аптечка','Общее']]}
+];
+const CATEGORIES = ['Документы','Электроника','Гигиена','Аптечка','Одежда','Для ребёнка','Питомцы','Еда','Дорога','Авто','Море','Поход','Прочее'];
+const CHECKLIST = ['Перекрыть воду','Проверить наличие денег и карт','Убедиться, что окна и двери закрыты','Выключить бытовые приборы','Проверить плиту','Вынести мусор','Проверить заряд телефонов и пауэрбанка','Проверить маршрут и время выезда'];
+let trips = JSON.parse(localStorage.getItem('sobiraisya_trips') || '[]');
+let activeTripId = null, activeTab = 'all', selectedTemplate = null;
+const $ = id => document.getElementById(id);
+function save(){ localStorage.setItem('sobiraisya_trips', JSON.stringify(trips)); }
+function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function roleToLabel(r){return r==='adult'?'Взрослый':r==='child'?'Ребёнок':'Питомец';}
+function iconForRole(r){return r==='adult'?'👤':r==='child'?'🧸':'🐾';}
+function currentTrip(){return trips.find(t=>t.id===activeTripId);}
+function addParticipant(name='', role='adult'){
+  const row=document.createElement('div'); row.className='participant-row';
+  row.innerHTML=`<input placeholder="Имя" value="${escapeHtml(name)}"><select><option value="adult">Взрослый</option><option value="child">Ребёнок</option><option value="pet">Питомец</option></select><button type="button" class="icon-btn">×</button>`;
+  row.querySelector('select').value=role; row.querySelector('button').onclick=()=>row.remove(); $('participants').appendChild(row);
+}
+function renderHome(){
+  $('purposeGrid').innerHTML=TEMPLATES.map(t=>`<button class="purpose ${selectedTemplate?.id===t.id?'selected':''}" onclick="chooseTemplate('${t.id}')"><span class="emoji">${t.icon}</span><span class="label">${t.name}</span></button>`).join('');
+  $('tripCount').textContent=trips.length ? `${trips.length} шт.` : '';
+  $('tripsList').innerHTML=trips.length ? trips.slice().reverse().map(t=>`<div class="trip" style="margin-bottom:10px"><div class="trip-icon">${t.icon}</div><button class="trip-data" style="border:0;background:transparent;text-align:left;padding:0" onclick="openTrip('${t.id}')"><div class="trip-name">${escapeHtml(t.name)}</div><div class="trip-meta">${escapeHtml(t.destination||'Без места')} · ${t.items.filter(i=>i.done).length}/${t.items.length} собрано</div></button><button class="icon-btn" onclick="deleteTrip('${t.id}')">×</button></div>`).join('') : '<div class="empty">Здесь появятся ваши списки поездок.</div>';
+}
+function chooseTemplate(id){selectedTemplate=TEMPLATES.find(t=>t.id===id); $('chosenPurpose').textContent=`${selectedTemplate.icon} ${selectedTemplate.name}`; $('tripName').value=selectedTemplate.name; $('participants').innerHTML=''; addParticipant('', 'adult'); show('createView'); renderHome();}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); $(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'});}
+function showHome(){activeTripId=null; selectedTemplate=null; renderHome(); show('homeView');}
+function participantData(){return [...$('participants').querySelectorAll('.participant-row')].map(r=>({name:r.querySelector('input').value.trim(),role:r.querySelector('select').value})).filter(p=>p.name);}
+function resolveOwner(owner, people){if(owner==='Общее')return 'Общее'; const p=people.find(x=>x.role===owner); return p?p.name:'Общее';}
+function createTrip(){
+  const name=$('tripName').value.trim(); const people=participantData(); if(!name){alert('Введите название поездки');return;} if(!people.length){alert('Добавьте хотя бы одного участника');return;}
+  const tpl=selectedTemplate||{id:'custom',icon:'🧳',name:'Своя поездка',items:[]};
+  const items=tpl.items.map(([category,itemName,owner])=>({id:crypto.randomUUID(),name:itemName,category,owner:resolveOwner(owner,people),done:false}));
+  const trip={id:crypto.randomUUID(),name,icon:tpl.icon,purpose:tpl.name,destination:$('destination').value.trim(),start:$('startDate').value,end:$('endDate').value,season:$('season').value,transport:$('transport').value,people,items,checklist:CHECKLIST.map(name=>({id:crypto.randomUUID(),name,done:false}))};
+  trips.push(trip); save(); activeTripId=trip.id; activeTab='all'; renderTrip(); show('tripView');
+}
+function openTrip(id){activeTripId=id;activeTab='all';renderTrip();show('tripView');}
+function deleteTrip(id){if(confirm('Удалить поездку и её список?')){trips=trips.filter(t=>t.id!==id);save();renderHome();}}
+function renderTrip(){
+  const t=currentTrip(); if(!t)return; $('activeTripTitle').textContent=`${t.icon} ${t.name}`;
+  const total=t.items.length, done=t.items.filter(i=>i.done).length, pct=total?Math.round(done/total*100):0;
+  $('progressText').textContent=`Собрано ${done} из ${total} вещей · ${pct}%`; $('progressBar').style.width=pct+'%';
+  const tabs=[['all','📋 Все'],['general','👥 Общее'],...t.people.map(p=>[p.name,`${iconForRole(p.role)} ${p.name}`]),['check','✅ Проверка']];
+  $('tabs').innerHTML=tabs.map(([id,label])=>`<button class="tab ${activeTab===id?'active':''}" onclick="setTab('${escapeHtml(id)}')">${label}</button>`).join('');
+  renderItems();
+}
+function setTab(tab){activeTab=tab;renderTrip();}
+function renderItems(){
+  const t=currentTrip(); if(activeTab==='check'){
+    $('itemsList').innerHTML='<div class="category">Проверка перед выходом</div>'+t.checklist.map(i=>itemHtml(i,'Проверка','',true)).join('');return;
+  }
+  let items=t.items; if(activeTab==='general')items=items.filter(i=>i.owner==='Общее'); else if(activeTab!=='all')items=items.filter(i=>i.owner===activeTab);
+  if(!items.length){$('itemsList').innerHTML='<div class="empty">Здесь пока нет вещей. Нажмите ＋, чтобы добавить.</div>';return;}
+  const groups={};items.forEach(i=>(groups[i.category]??=[]).push(i));
+  $('itemsList').innerHTML=Object.entries(groups).map(([cat,arr])=>`<div class="category">${cat}</div>${arr.map(i=>itemHtml(i,cat,i.owner,false)).join('')}`).join('');
+}
+function itemHtml(i,cat,owner,isCheck){return `<div class="item ${i.done?'done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleItem('${i.id}',${isCheck})"><div class="item-body"><div class="item-name">${escapeHtml(i.name)}</div>${owner?`<div class="item-sub">${escapeHtml(owner)} · ${cat}</div>`:''}</div><button class="remove" onclick="removeItem('${i.id}',${isCheck})">×</button></div>`;}
+function toggleItem(id,isCheck){const t=currentTrip(),i=(isCheck?t.checklist:t.items).find(x=>x.id===id);i.done=!i.done;save();renderTrip();}
+function removeItem(id,isCheck){const t=currentTrip();if(isCheck)t.checklist=t.checklist.filter(i=>i.id!==id);else t.items=t.items.filter(i=>i.id!==id);save();renderTrip();}
+function openItemDialog(){const t=currentTrip();$('itemCategory').innerHTML=CATEGORIES.map(c=>`<option>${c}</option>`).join('');$('itemOwner').innerHTML=['Общее',...t.people.map(p=>p.name)].map(o=>`<option>${escapeHtml(o)}</option>`).join('');$('itemName').value='';$('itemDialog').showModal();}
+function addItem(){const name=$('itemName').value.trim();if(!name)return;const t=currentTrip();t.items.push({id:crypto.randomUUID(),name,category:$('itemCategory').value,owner:$('itemOwner').value,done:false});save();$('itemDialog').close();renderTrip();}
+function saveTemplate(){const t=currentTrip();const templates=JSON.parse(localStorage.getItem('sobiraisya_custom_templates')||'[]');templates.push({name:t.name,createdAt:new Date().toISOString(),items:t.items.map(({name,category,owner})=>({name,category,owner}))});localStorage.setItem('sobiraisya_custom_templates',JSON.stringify(templates));alert('Список сохранён как личный шаблон на этом iPhone.');}
+addParticipant('','adult'); renderHome();
+</script>
+</body>
+</html>
