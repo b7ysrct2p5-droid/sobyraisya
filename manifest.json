@@ -1,0 +1,18 @@
+{
+  "name": "Собирайся!",
+  "short_name": "Собирайся",
+  "description": "Списки для поездок и сборов",
+  "lang": "ru",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#617d9e",
+  "icons": [
+    {
+      "src": "./app-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
